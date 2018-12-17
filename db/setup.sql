@@ -1,0 +1,1 @@
+CREATE DATABASE nc_news_db
