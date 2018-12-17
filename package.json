@@ -12,8 +12,9 @@
     "create:config": "knex init",
     "migrate:make": "knex migrate:make",
     "migrate:latest": "knex migrate:latest",
-    "migrate:rollback": "knex migrate:rollback"
-  },
+    "migrate:rollback": "knex migrate:rollback",
+    "create:seed": "knex seed:make seed"
+    },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/northcoders/BE2-NC-Knews.git"
