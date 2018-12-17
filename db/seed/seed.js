@@ -1,12 +1,16 @@
 
 const {
-  topicData,
-  // userData, articleData, commentData,
+  topicData, userData,
+  // articleData, commentData,
 } = require('../data');
 // const { } = require('../utils');
 
 exports.seed = function (knex, Promise) {
-  return knex('topics').del()
+  return Promise.all([
+    knex('topics').del(),
+    knex('users').del(),
+  ])
+
     .then(() => knex('topics').insert(topicData).returning('*'))
-    .then(console.log);
+    .then(() => knex('users').insert(userData).returning('*'));
 };
