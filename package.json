@@ -10,7 +10,9 @@
     "pre-commit": "npm t",
     "posttest": "npm run lint",
     "create:config": "knex init",
-    "migrate:make": "knex migrate:make"
+    "migrate:make": "knex migrate:make",
+    "migrate:latest": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback"
   },
   "repository": {
     "type": "git",
