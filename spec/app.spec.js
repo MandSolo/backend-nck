@@ -39,12 +39,27 @@ describe('/api', () => {
           expect(res.body.topic.slug).to.equal(topic.slug);
         });
     });
+
     describe('/:topic/articles', () => {
-      it('GET status: 200 an array of articles for a given topic with the correct keys', () => request
+      it('GET status: 200 returns an array of articles for a given topic with the correct keys', () => request
         .get('/api/topics/cats/articles').expect(200)
         .then(({ body }) => {
           expect(body.articles).to.have.length(1);
           expect(body.articles[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'comment_count', 'created_at', 'topic');
+        }));
+      // testing queries starts here!!!!!!!!!!!
+      it('GET status: 200 and has a limit query of 1', () => request
+        .get('/api/topics/cats/articles?limit=1')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).to.have.length(1);
+        }));
+      it('GET status: 200 and sorts articles by any valid column', () => request
+        .get('/api/topics/mitch/articles?maxResult&sort_by=title')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].title).to.equal('A');
+          expect(res.body.articles[9].title).to.equal('They\'re not exactly dogs, are they?');
         }));
     });
   });
