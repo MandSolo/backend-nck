@@ -12,7 +12,7 @@ describe('/api', () => {
   after(() => connection.destroy());
 
   it('GET status: 404 if directed to an endpoint that does not exist', () => request
-    .get('/api/notARealEndpoint')
+    .get('/notARealEndpoint')
     .expect(404)
     .then((res) => {
       expect(res.body.msg).to.equal('error page not found');
@@ -28,5 +28,24 @@ describe('/api', () => {
         expect(res.body.topics[0].slug).to.equal('mitch');
         expect(res.body.topics).to.have.length(2);
       }));
+    it('POST status: 201 accepts an object containing slug and description property, the slug must be unique and responds with the posted topic object', () => {
+      const topic = { description: 'Code is love, code is life', slug: 'coding' };
+      return request
+        .post('/api/topics')
+        .send(topic)
+        .expect(201)
+        .then((res) => {
+          expect(res.body.topic.description).to.equal(topic.description);
+          expect(res.body.topic.slug).to.equal(topic.slug);
+        });
+    });
+    describe('/:topic/articles', () => {
+      it('GET status: 200 an array of articles for a given topic with the correct keys', () => request
+        .get('/api/topics/cats/articles').expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.have.length(1);
+          expect(body.articles[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'comment_count', 'created_at', 'topic');
+        }));
+    });
   });
 });
