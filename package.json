@@ -8,7 +8,7 @@
     "lint": "eslint ./",
     "lint:fix": "eslint --fix ./",
     "pre-commit": "npm t",
-    "posttest": "npm run lint", 
+    "posttest": "npm run lint",
     "create:config": "knex init",
     "migrate:make": "knex migrate:make",
     "migrate:latest": "knex migrate:latest --env test",
@@ -16,7 +16,7 @@
     "create:seed": "knex seed:make seed",
     "create:db": "psql -f ./db/setupTest.sql",
     "seed:run": "knex migrate:rollback --env test && knex migrate:latest --env test && knex seed:run --env test"
-    },
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/northcoders/BE2-NC-Knews.git"
@@ -30,6 +30,7 @@
   "homepage": "https://github.com/northcoders/BE2-NC-Knews#readme",
   "dependencies": {
     "knex": "^0.15.2",
+    "moment": "^2.23.0",
     "pg": "^7.6.1",
     "sqlite3": "^4.0.4"
   },
