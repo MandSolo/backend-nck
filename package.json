@@ -15,7 +15,7 @@
     "migrate:rollback": "knex migrate:rollback --env test",
     "create:seed": "knex seed:make seed",
     "create:db": "psql -f ./db/setupTest.sql",
-    "seed:run": "knex migrate:rollback --env test && knex migrate:latest --env test && knex seed:run --env test",
+    "seed:run": "knex migrate:rollback --env test && knex migrate:latest --env test && NODE_ENV=test knex seed:run --env test",
     "dev": "nodemon listen.js"
   },
   "repository": {
@@ -35,10 +35,8 @@
     "express": "^4.16.4",
     "knex": "^0.15.2",
     "mocha": "^5.2.0",
-    "moment": "^2.23.0",
     "nodemon": "^1.18.9",
     "pg": "^7.6.1",
-    "sqlite3": "^4.0.4",
     "supertest": "^3.3.0"
   },
   "devDependencies": {
