@@ -37,6 +37,18 @@ exports.getAllTopicsForArticle = (req, res, next) => {
 // topic
 // comment_count which is the accumulated count of all the comments with this article_id.
 // You should make use of knex queries in order to achieve this.
+
+  // Queries!!!!!!!!!!!!
+  // This route should accept the following queries:
+  // limit, which limits the number of responses (defaults to 10)
+  // sort_by, which sorts the articles by any valid column (defaults to date)
+  // p, stands for page which specifies the page at which to start (calculated using limit)
+  // sort_ascending, when "true" returns the results sorted in ascending order (defaults to descending)
+
+  // IMPORTANT:
+  // Both comments and articles data in the test-data are given ordered in descending order of time :
+  // this will be useful to you when it comes to writing your tests!
+
   const { topic } = req.params;
 
   const { limit: maxResult = 10 } = req.query;
@@ -60,12 +72,6 @@ exports.getAllTopicsForArticle = (req, res, next) => {
     .where({ topic })
     .limit(maxResult)
     .orderBy(sort_by)
-    .then(articles => res.status(200).send({ articles }));
+    .then(articles => res.status(200).send({ articles }))
+    .catch(next);
 };
-
-// Queries!!!!!!!!!!!!
-// This route should accept the following queries:
-// limit, which limits the number of responses (defaults to 10)
-// sort_by, which sorts the articles by any valid column (defaults to date)
-// p, stands for page which specifies the page at which to start (calculated using limit)
-// sort_ascending, when "true" returns the results sorted in ascending order (defaults to descending)

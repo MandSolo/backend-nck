@@ -39,6 +39,14 @@ describe('/api', () => {
           expect(res.body.topic.slug).to.equal(topic.slug);
         });
     });
+    // error handling tests start here!!!!!!!!
+    it('POST status 400: input provided is invalid', () => request
+      .post('/api/topics')
+      .send({ starbucks: 'toffee nut latte' })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).to.equal('invalid input');
+      }));
 
     describe('/:topic/articles', () => {
       it('GET status: 200 returns an array of articles for a given topic with the correct keys', () => request
