@@ -52,23 +52,14 @@ exports.getAllTopicsForArticle = (req, res, next) => {
   // this will be useful to you when it comes to writing your tests!
 
   const { topic } = req.params;
-
-  const {
-    limit: maxResult = 10, sort_ascending, p = 1,
-  } = req.query;
+  const { limit: maxResult = 10, sort_ascending, p = 1 } = req.query;
   let { sort_by } = req.query;
-
-  if (isNaN(maxResult)) return next({ status: 400, msg: 'invalid input syntax for type integer' });
-
-  if (isNaN(p)) return next({ status: 400, msg: 'invalid input syntax for type integer' });
-
   let order_by = 'desc';
-  if (sort_ascending === 'true') {
-    order_by = 'asc';
-  }
-
+  if (sort_ascending === 'true') { order_by = 'asc'; }
   const validSortQueries = ['title', 'author', 'article_id', 'created_at', 'topic', 'votes', 'comment_count'];
   if (!validSortQueries.includes(sort_by)) sort_by = 'created_at';
+  if (isNaN(maxResult)) return next({ status: 400, msg: 'invalid input syntax for type integer' });
+  if (isNaN(p)) return next({ status: 400, msg: 'invalid input syntax for type integer' });
 
   return connection.select(
     'articles.title',
@@ -88,5 +79,19 @@ exports.getAllTopicsForArticle = (req, res, next) => {
     .offset(maxResult * (p - 1))
     .orderBy(sort_by, order_by)
     .then(articles => res.status(200).send({ articles }))
+    .catch(next);
+};
+
+exports.addArticle = (req, res, next) => {
+  // accepts an object containing a title, body and a username property
+  // responds with the posted article
+
+  const articleObj = { ...req.body, ...req.params };
+  return connection('articles')
+    .insert(articleObj)
+    .returning('*')
+    .then(([article]) => {
+      res.status(201).send({ article });
+    })
     .catch(next);
 };

@@ -4,11 +4,12 @@ const connection = require('../db/connection');
 const request = require('supertest')(app);
 const { expect } = require('chai');
 
+// //////////////////////////////////////////////////////////////
+
 describe('/api', () => {
   beforeEach(() => connection.migrate.rollback()
     .then(() => connection.migrate.latest())
     .then(() => connection.seed.run()));
-
   after(() => connection.destroy());
 
   it('GET status: 404 directed to an endpoint that does not exist', () => request
@@ -17,6 +18,8 @@ describe('/api', () => {
     .then((res) => {
       expect(res.body.msg).to.equal('error page not found');
     }));
+
+  // //////////////////////////////////////////////////////////////
 
   describe('/topics', () => {
     it('GET status: 200 responds with an array of topic objects with the correct keys and properties', () => request
@@ -59,12 +62,15 @@ describe('/api', () => {
           expect(res.body.msg).to.equal('duplicate key value violates unique constraint');
         });
     });
+
     it('ALL status: 405 input method is not get or post', () => request
       .delete('/api/topics')
       .expect(405)
       .then((res) => {
         expect(res.body.msg).to.equal('method not allowed');
       }));
+
+    // //////////////////////////////////////////////////////////////
 
     describe('/:topic/articles', () => {
       it('GET status: 200 returns an array of articles for a given topic with the correct keys', () => request
@@ -73,7 +79,6 @@ describe('/api', () => {
           expect(body.articles).to.have.length(1);
           expect(body.articles[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'comment_count', 'created_at', 'topic');
         }));
-      // testing queries starts here!!!!!!!!!!!
       it('GET status: 200 has a limit query of 1', () => request
         .get('/api/topics/cats/articles?limit=1')
         .expect(200)
@@ -123,6 +128,28 @@ describe('/api', () => {
         .then((res) => {
           expect(res.body.msg).to.equal('invalid input syntax for type integer');
         }));
+      it('GET status: 404 given non existant topic', () => request
+        .get('/api/topics/ronaldo')
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).to.equal('error page not found');
+        }));
+
+      it.only('POST status: 201 accepts an object containing a title, body and username property and responds with the posted article', () => {
+        const postTest = {
+          title: 'united are the best',
+          body: '20 times, 20 times, man united',
+          username: 'starmanda',
+        };
+        return request
+          .post('/api/topics/mitch/articles')
+          .send(postTest)
+          .expect(201)
+          .then((res) => {
+            expect(res.body.newArticle).to.haveOwnProperty('article_id');
+            expect(res.body.newArticle.article_id).to.equal(13);
+          });
+      });
     });
   });
 });

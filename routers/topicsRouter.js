@@ -1,6 +1,6 @@
 const topicsRouter = require('express').Router();
 const {
-  getAllTopics, addTopic, getAllTopicsForArticle,
+  getAllTopics, addTopic, getAllTopicsForArticle, addArticle,
 } = require('../controllers/topicsController');
 const { handle405 } = require('../errors/index.js');
 
@@ -13,6 +13,7 @@ topicsRouter
 topicsRouter
   .route('/:topic/articles')
   .get(getAllTopicsForArticle)
+  .post(addArticle)
   .all(handle405);
 
 module.exports = topicsRouter;
