@@ -39,7 +39,6 @@ describe('/api', () => {
           expect(res.body.topic.slug).to.equal(topic.slug);
         });
     });
-    // error handling tests start here!!!!!!!!
     it('POST status: 400 input provided is invalid', () => request
       .post('/api/topics')
       .send({ starbucks: 'toffee nut latte' })
@@ -47,7 +46,20 @@ describe('/api', () => {
       .then((res) => {
         expect(res.body.msg).to.equal('invalid input');
       }));
-    it('ALL status: 405 if input method that isnt get/post', () => request
+    it('POST status: 422 input provided is a non-unique slug', () => {
+      const topic = {
+        description: 'The man, the Mitch, the legend',
+        slug: 'mitch',
+      };
+      return request
+        .post('/api/topics')
+        .send(topic)
+        .expect(422)
+        .then((res) => {
+          expect(res.body.msg).to.equal('duplicate key value violates unique constraint');
+        });
+    });
+    it('ALL status: 405 if input method that is not get or post', () => request
       .delete('/api/topics')
       .expect(405)
       .then((res) => {
@@ -68,12 +80,30 @@ describe('/api', () => {
         .then((res) => {
           expect(res.body.articles).to.have.length(1);
         }));
+      it('GET status: 400 invalid syntax is used in the limit query', () => request
+        .get('/api/topics/cats/articles?limit=kfc')
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).to.equal('invalid input syntax for type integer');
+        }));
       it('GET status: 200 and sorts articles by any valid column', () => request
         .get('/api/topics/mitch/articles?maxResult&sort_by=title')
         .expect(200)
         .then((res) => {
           expect(res.body.articles[0].title).to.equal('A');
           expect(res.body.articles[9].title).to.equal('They\'re not exactly dogs, are they?');
+        }));
+      it('GET status: 200 articles sorted by chosen column', () => request
+        .get('/api/topics/mitch/articles?sort_by=author')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].author).to.equal('butter_bridge');
+        }));
+      it('GET status: 200 200 articles sorted by default of column created_at if invalid sort is given', () => request
+        .get('/api/topics/mitch/articles?sort_by=charizard')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].title).to.equal('Moustache');
         }));
     });
   });

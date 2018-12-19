@@ -1,4 +1,6 @@
-/*  eslint "max-len": 0 */
+/*  eslint "max-len": 0,
+"no-restricted-globals": 0,
+*/
 
 const connection = require('../db/connection');
 
@@ -52,6 +54,8 @@ exports.getAllTopicsForArticle = (req, res, next) => {
   const { topic } = req.params;
 
   const { limit: maxResult = 10 } = req.query;
+  if (isNaN(maxResult)) return next({ status: 400, msg: 'invalid input syntax for type integer' });
+
   let { sort_by } = req.query;
   const validSortQueries = ['title', 'author', 'article_id', 'created_at', 'topic', 'votes', 'comment_count'];
   if (!validSortQueries.includes(sort_by)) sort_by = 'created_at';
