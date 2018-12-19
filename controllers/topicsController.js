@@ -53,10 +53,20 @@ exports.getAllTopicsForArticle = (req, res, next) => {
 
   const { topic } = req.params;
 
-  const { limit: maxResult = 10 } = req.query;
+  const {
+    limit: maxResult = 10, sort_ascending, p = 1,
+  } = req.query;
+  let { sort_by } = req.query;
+
   if (isNaN(maxResult)) return next({ status: 400, msg: 'invalid input syntax for type integer' });
 
-  let { sort_by } = req.query;
+  if (isNaN(p)) return next({ status: 400, msg: 'invalid input syntax for type integer' });
+
+  let order_by = 'desc';
+  if (sort_ascending === 'true') {
+    order_by = 'asc';
+  }
+
   const validSortQueries = ['title', 'author', 'article_id', 'created_at', 'topic', 'votes', 'comment_count'];
   if (!validSortQueries.includes(sort_by)) sort_by = 'created_at';
 
@@ -75,7 +85,8 @@ exports.getAllTopicsForArticle = (req, res, next) => {
     .count('comments.comment_id AS comment_count')
     .where({ topic })
     .limit(maxResult)
-    .orderBy(sort_by)
+    .offset(maxResult * (p - 1))
+    .orderBy(sort_by, order_by)
     .then(articles => res.status(200).send({ articles }))
     .catch(next);
 };

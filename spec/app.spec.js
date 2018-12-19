@@ -11,7 +11,7 @@ describe('/api', () => {
 
   after(() => connection.destroy());
 
-  it('GET status: 404 if directed to an endpoint that does not exist', () => request
+  it('GET status: 404 directed to an endpoint that does not exist', () => request
     .get('/notARealEndpoint')
     .expect(404)
     .then((res) => {
@@ -59,7 +59,7 @@ describe('/api', () => {
           expect(res.body.msg).to.equal('duplicate key value violates unique constraint');
         });
     });
-    it('ALL status: 405 if input method that is not get or post', () => request
+    it('ALL status: 405 input method is not get or post', () => request
       .delete('/api/topics')
       .expect(405)
       .then((res) => {
@@ -74,7 +74,7 @@ describe('/api', () => {
           expect(body.articles[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'comment_count', 'created_at', 'topic');
         }));
       // testing queries starts here!!!!!!!!!!!
-      it('GET status: 200 and has a limit query of 1', () => request
+      it('GET status: 200 has a limit query of 1', () => request
         .get('/api/topics/cats/articles?limit=1')
         .expect(200)
         .then((res) => {
@@ -86,24 +86,42 @@ describe('/api', () => {
         .then((res) => {
           expect(res.body.msg).to.equal('invalid input syntax for type integer');
         }));
-      it('GET status: 200 and sorts articles by any valid column', () => request
+      it('GET status: 200 sorts articles by any valid column', () => request
         .get('/api/topics/mitch/articles?maxResult&sort_by=title')
         .expect(200)
         .then((res) => {
-          expect(res.body.articles[0].title).to.equal('A');
-          expect(res.body.articles[9].title).to.equal('They\'re not exactly dogs, are they?');
+          expect(res.body.articles[0].title).to.equal('Z');
+          expect(res.body.articles[9].title).to.equal('Am I a cat?');
         }));
       it('GET status: 200 articles sorted by chosen column', () => request
         .get('/api/topics/mitch/articles?sort_by=author')
         .expect(200)
         .then((res) => {
-          expect(res.body.articles[0].author).to.equal('butter_bridge');
+          expect(res.body.articles[0].author).to.equal('rogersop');
         }));
-      it('GET status: 200 200 articles sorted by default of column created_at if invalid sort is given', () => request
+      it('GET status: 200 articles sorted by default of column created_at if invalid sort is given', () => request
         .get('/api/topics/mitch/articles?sort_by=charizard')
         .expect(200)
         .then((res) => {
+          expect(res.body.articles[0].title).to.equal('Living in the shadow of a great man');
+        }));
+      it('GET status: 200 articles sorted by chosen column and order of sort', () => request
+        .get('/api/topics/mitch/articles?sort_by=title&sort_ascending=true')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].title).to.equal('A');
+        }));
+      it('GET status: 200 returns articles on a given page', () => request
+        .get('/api/topics/mitch/articles?p=2')
+        .expect(200)
+        .then((res) => {
           expect(res.body.articles[0].title).to.equal('Moustache');
+        }));
+      it('GET status: 400 invalid syntax is used in the p query', () => request
+        .get('/api/topics/cats/articles?p=kfc')
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).to.equal('invalid input syntax for type integer');
         }));
     });
   });
