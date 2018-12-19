@@ -40,12 +40,18 @@ describe('/api', () => {
         });
     });
     // error handling tests start here!!!!!!!!
-    it('POST status 400: input provided is invalid', () => request
+    it('POST status: 400 input provided is invalid', () => request
       .post('/api/topics')
       .send({ starbucks: 'toffee nut latte' })
       .expect(400)
       .then((res) => {
         expect(res.body.msg).to.equal('invalid input');
+      }));
+    it('ALL status: 405 if input method that isnt get/post', () => request
+      .delete('/api/topics')
+      .expect(405)
+      .then((res) => {
+        expect(res.body.msg).to.equal('method not allowed');
       }));
 
     describe('/:topic/articles', () => {
