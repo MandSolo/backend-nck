@@ -86,12 +86,16 @@ exports.addArticle = (req, res, next) => {
   // accepts an object containing a title, body and a username property
   // responds with the posted article
 
-  const articleObj = { ...req.body, ...req.params };
+  const { topic } = req.params;
+  const { title, username, body } = req.body;
   return connection('articles')
-    .insert(articleObj)
-    .returning('*')
-    .then(([article]) => {
-      res.status(201).send({ article });
+    .insert({
+      title,
+      topic,
+      body,
+      username,
     })
+    .returning('*')
+    .then(([article]) => res.status(201).send({ article }))
     .catch(next);
 };

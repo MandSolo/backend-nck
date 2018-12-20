@@ -135,19 +135,18 @@ describe('/api', () => {
           expect(res.body.msg).to.equal('error page not found');
         }));
 
-      it.only('POST status: 201 accepts an object containing a title, body and username property and responds with the posted article', () => {
-        const postTest = {
+      it('POST status: 201 accepts an object containing a title, body and username property and responds with the posted article', () => {
+        const newPost = {
           title: 'united are the best',
           body: '20 times, 20 times, man united',
-          username: 'starmanda',
+          username: 'butter_bridge',
         };
         return request
           .post('/api/topics/mitch/articles')
-          .send(postTest)
+          .send(newPost)
           .expect(201)
           .then((res) => {
-            expect(res.body.newArticle).to.haveOwnProperty('article_id');
-            expect(res.body.newArticle.article_id).to.equal(13);
+            expect(res.body.article.title).to.equal('united are the best');
           });
       });
     });
