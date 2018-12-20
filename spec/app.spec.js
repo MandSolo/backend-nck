@@ -235,7 +235,7 @@ describe('/api', () => {
     // //////////////////////////////////////////////////////////////
 
     describe('/articles/:article_id', () => {
-      it('GET status: 200 responds with an array of article objects', () => request
+      it('GET status: 200 responds with an array of article objects with the correct keys and properties', () => request
         .get('/api/articles/1')
         .expect(200)
         .then((res) => {
@@ -282,7 +282,7 @@ describe('/api', () => {
           expect(res.body.article.title).to.equal('Living in the shadow of a great man');
           expect(res.body.article.votes).to.equal(80);
         }));
-      it.only('DELETE status 204: removes given article by article id', () => request
+      it('DELETE status 204: removes given article by article id', () => request
         .delete('/api/articles/1')
         .expect(204)
         .then((res) => {
@@ -295,6 +295,26 @@ describe('/api', () => {
         .then((res) => {
           expect(res.body.msg).to.equal('method not allowed');
         }));
+
+      // //////////////////////////////////////////////////////////////
+
+      describe('/articles/:article_id/comments', () => {
+        it('GET status: 200 responds with an array of comment objects with the correct keys and properties', () => request
+          .get('/api/articles/1/comments')
+          .expect(200)
+          .then((res) => {
+            expect(res.body.comments).to.be.an('array');
+            expect(res.body.comments[0]).to.have.all.keys(
+              'comment_id',
+              'author',
+              'votes',
+              'created_at',
+              'body',
+            );
+            expect(res.body.comments[0].author).to.equal('butter_bridge');
+            expect(res.body.comments[0].body).to.equal('The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.');
+          }));
+      });
     });
   });
 });

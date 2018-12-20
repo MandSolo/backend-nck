@@ -124,3 +124,49 @@ exports.deleteArticleByID = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getCommentsByArticleID = (req, res, next) => {
+  // responds with an array of comments for the given article_id
+  // each comment should have
+  // comment_id
+  // votes
+  // created_at
+  // author which is the username from the users table
+  // body
+
+  // Queries!!!!!!!!!!!!!
+  // This route should accept the following queries:
+  // limit, which limits the number of responses (defaults to 10)
+  // sort_by, which sorts the articles by any valid column (defaults to date)
+  // p, stands for page which specifies the page at which to start (calculated using limit)
+  // sort_ascending, when "true" returns the results sorted in ascending order (defaults to descending)
+
+  const { article_id } = req.params;
+  const { limit: maxResult = 10, sort_ascending, p = 1 } = req.query;
+  let { sort_by } = req.query;
+  let order_by = 'desc';
+  if (sort_ascending === 'true') { order_by = 'asc'; }
+  const validSortQueries = ['title', 'author', 'article_id', 'created_at', 'topic', 'votes', 'comment_count'];
+  if (!validSortQueries.includes(sort_by)) sort_by = 'created_at';
+  if (isNaN(maxResult)) return next({ status: 400, msg: 'invalid input syntax for type integer' });
+  if (isNaN(p)) return next({ status: 400, msg: 'invalid input syntax for type integer' });
+
+  return connection('comments')
+    .select(
+      'comments.comment_id',
+      'comments.votes',
+      'comments.created_at',
+      'users.username AS author',
+      'comments.body',
+    )
+    .join('users', 'users.username', '=', 'comments.username')
+    .where('article_id', article_id)
+    .limit(maxResult)
+    .offset(maxResult * (p - 1))
+    .orderBy(sort_by, order_by)
+    .then((comments) => {
+      if (comments.length === 0) return Promise.reject({ status: 404, msg: 'error page not found' });
+      return res.status(200).send({ comments });
+    })
+    .catch(next);
+};

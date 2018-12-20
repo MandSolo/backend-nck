@@ -1,6 +1,6 @@
 const articlesRouter = require('express').Router();
 const {
-  getAllArticles, getArticleByID, updateVotesForArticle, deleteArticleByID,
+  getAllArticles, getArticleByID, updateVotesForArticle, deleteArticleByID, getCommentsByArticleID,
 } = require('../controllers/articlesController');
 const { handle405 } = require('../errors/index.js');
 
@@ -14,5 +14,9 @@ articlesRouter
   .patch(updateVotesForArticle)
   .delete(deleteArticleByID)
   .all(handle405);
+
+articlesRouter
+  .route('/:article_id/comments')
+  .get(getCommentsByArticleID);
 
 module.exports = articlesRouter;
