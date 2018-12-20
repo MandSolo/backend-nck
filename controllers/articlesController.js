@@ -103,8 +103,24 @@ exports.updateVotesForArticle = (req, res, next) => {
     .increment('votes', inc_votes)
     .returning('*')
     .then(([article]) => {
-      if (article.length === 0) return Promise.reject({ status: 404, message: 'page not found' });
+      if (article.length === 0) return Promise.reject({ status: 404, msg: 'error page not found' });
       return res.status(202).send({ article });
+    })
+    .catch(next);
+};
+
+exports.deleteArticleByID = (req, res, next) => {
+  // should delete the given article by article_id
+  // should respond with an empty object
+
+  const { article_id } = req.params;
+  connection('articles')
+    .where('article_id', article_id)
+    .del()
+    .returning('*')
+    .then((article) => {
+      if (article.length === 0) return Promise.reject({ status: 404, msg: 'error page not found' });
+      return res.status(204).send({});
     })
     .catch(next);
 };

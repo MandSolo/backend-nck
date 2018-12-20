@@ -274,13 +274,26 @@ describe('/api', () => {
           expect(res.body.article.title).to.equal('Living in the shadow of a great man');
           expect(res.body.article.votes).to.equal(120);
         }));
-      it.only('PATCH status: 202 takes an object and increases votes if postive integer given', () => request
+      it('PATCH status: 202 takes an object and increases votes if postive integer given', () => request
         .patch('/api/articles/1')
         .send({ inc_votes: -20 })
         .expect(202)
         .then((res) => {
           expect(res.body.article.title).to.equal('Living in the shadow of a great man');
           expect(res.body.article.votes).to.equal(80);
+        }));
+      it.only('DELETE status 204: removes given article by article id', () => request
+        .delete('/api/articles/1')
+        .expect(204)
+        .then((res) => {
+          expect(res.body).to.eql({});
+        }));
+      it('ALL status: 405 input method is not get, patch or delete', () => request
+        .post('/api/articles/1')
+        .send({ name: 'mand' })
+        .expect(405)
+        .then((res) => {
+          expect(res.body.msg).to.equal('method not allowed');
         }));
     });
   });
