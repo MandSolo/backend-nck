@@ -6,6 +6,7 @@ const connection = require('../db/connection');
 
 exports.getAllTopics = (req, res, next) => {
 // responds with an array of topic objects - each object should have a slug and description property
+
   connection
     .select('*')
     .from('topics')
@@ -18,6 +19,7 @@ exports.getAllTopics = (req, res, next) => {
 exports.addTopic = (req, res, next) => {
 // accepts an object containing slug and description property, the slug must be unique
 // responds with the posted topic object
+
   connection
     .returning('*')
     .insert(req.body)
@@ -28,7 +30,7 @@ exports.addTopic = (req, res, next) => {
     .catch(next);
 };
 
-exports.getAllTopicsForArticle = (req, res, next) => {
+exports.getAllArticlesForTopic = (req, res, next) => {
 // responds with an array of article objects for a given topic
 // each article should have:
 // author which is the username from the users table,

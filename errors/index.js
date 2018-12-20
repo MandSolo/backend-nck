@@ -1,3 +1,9 @@
+exports.handle404 = (err, req, res, next) => {
+  if (err.status === 404) res.status(404).send({ msg: 'error page not found' });
+  else next(err);
+};
+
+
 exports.handle400 = (err, req, res, next) => {
   const codes = {
     42703: 'invalid input',

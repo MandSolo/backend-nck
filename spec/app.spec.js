@@ -147,8 +147,141 @@ describe('/api', () => {
           .expect(201)
           .then((res) => {
             expect(res.body.article.title).to.equal('united are the best');
+            expect(res.body.article).to.haveOwnProperty('article_id');
+            expect(res.body.article.article_id).to.equal(13);
           });
       });
+    });
+  });
+
+
+  // //////////////////////////////////////////////////////////////
+
+  describe('/articles', () => {
+    it('GET status: 200 responds with an array of article objects with the correct keys and properties', () => request
+      .get('/api/articles')
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).to.be.an('array');
+        expect(res.body.articles[0]).to.have.all.keys(
+          'author',
+          'article_id',
+          'body',
+          'title',
+          'votes',
+          'topic',
+          'comment_count',
+          'created_at',
+        );
+        expect(res.body.articles[0].topic).to.equal('mitch');
+        expect(res.body.articles[0].title).to.equal('Living in the shadow of a great man');
+        expect(res.body.articles).to.have.length(10);
+      }));
+    it('GET status: 200 has a limit query of 1', () => request
+      .get('/api/articles?limit=1')
+      .expect(200).then((res) => {
+        expect(res.body.articles).to.have.length(1);
+      }));
+    it('GET status: 400 invalid syntax is used in the limit query', () => request
+      .get('/api/articles?limit=kfc')
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).to.equal('invalid input syntax for type integer');
+      }));
+    it('GET status: 200 sorts articles by any valid column', () => request
+      .get('/api/articles?maxResult&sort_by=title')
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles[0].title).to.equal('Z');
+        expect(res.body.articles[9].title).to.equal('Does Mitch predate civilisation?');
+      }));
+    it('GET status: 200 articles sorted by chosen column', () => request
+      .get('/api/articles?sort_by=author')
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles[0].author).to.equal('rogersop');
+      }));
+    it('GET status: 200 articles sorted by default of column created_at if invalid sort is given', () => request
+      .get('/api/articles?sort_by=charizard')
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles[0].title).to.equal('Living in the shadow of a great man');
+      }));
+    it('GET status: 200 articles sorted by chosen column and order of sort', () => request
+      .get('/api/articles?sort_by=title&sort_ascending=true')
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles[0].title).to.equal('A');
+      }));
+    it('GET status: 200 returns articles on a given page', () => request
+      .get('/api/articles?p=2')
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles[0].title).to.equal('Am I a cat?');
+      }));
+    it('GET status: 400 invalid syntax is used in the p query', () => request
+      .get('/api/articles?p=kfc')
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).to.equal('invalid input syntax for type integer');
+      }));
+    it('GET status: 404 given non existant article', () => request
+      .get('/api/articles/ronaldo')
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).to.equal('error page not found');
+      }));
+
+    // //////////////////////////////////////////////////////////////
+
+    describe('/articles/:article_id', () => {
+      it('GET status: 200 responds with an array of article objects', () => request
+        .get('/api/articles/1')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).to.be.an('array');
+          expect(res.body.articles[0]).to.have.all.keys(
+            'article_id',
+            'author',
+            'title',
+            'votes',
+            'topic',
+            'body',
+            'comment_count',
+            'created_at',
+          );
+          expect(res.body.articles[0].topic).to.equal('mitch');
+          expect(res.body.articles[0].body).to.equal('I find this existence challenging');
+          expect(res.body.articles).to.have.length(1);
+        }));
+      it('GET status: 400 invalid syntax is used for article id', () => request
+        .get('/api/articles/food')
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).to.equal('invalid input syntax for type integer');
+        }));
+      it('GET status: 404 if given non existant article id', () => request
+        .get('/api/articles/197666')
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).to.equal('error page not found');
+        }));
+      it('PATCH status: 202 takes an object and increases votes if postive integer given', () => request
+        .patch('/api/articles/1')
+        .send({ inc_votes: 20 })
+        .expect(202)
+        .then((res) => {
+          expect(res.body.article.title).to.equal('Living in the shadow of a great man');
+          expect(res.body.article.votes).to.equal(120);
+        }));
+      it.only('PATCH status: 202 takes an object and increases votes if postive integer given', () => request
+        .patch('/api/articles/1')
+        .send({ inc_votes: -20 })
+        .expect(202)
+        .then((res) => {
+          expect(res.body.article.title).to.equal('Living in the shadow of a great man');
+          expect(res.body.article.votes).to.equal(80);
+        }));
     });
   });
 });
