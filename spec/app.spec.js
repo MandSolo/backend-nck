@@ -1,3 +1,5 @@
+/*  eslint "max-len": 0 */
+
 process.env.NODE_ENV = 'test';
 const app = require('../app');
 const connection = require('../db/connection');
@@ -274,7 +276,7 @@ describe('/api', () => {
           expect(res.body.article.title).to.equal('Living in the shadow of a great man');
           expect(res.body.article.votes).to.equal(120);
         }));
-      it('PATCH status: 202 takes an object and increases votes if postive integer given', () => request
+      it('PATCH status: 202 takes an object and decreases votes if negative integer given', () => request
         .patch('/api/articles/1')
         .send({ inc_votes: -20 })
         .expect(202)
@@ -314,6 +316,95 @@ describe('/api', () => {
             expect(res.body.comments[0].author).to.equal('butter_bridge');
             expect(res.body.comments[0].body).to.equal('The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.');
           }));
+        it('GET status: 200 has a limit query of 1', () => request
+          .get('/api/articles/1/comments?limit=1')
+          .expect(200).then((res) => {
+            expect(res.body.comments).to.have.length(1);
+          }));
+        it('GET status: 400 invalid syntax is used in the limit query', () => request
+          .get('/api/articles/1/comments?limit=kfc')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).to.equal('invalid input syntax for type integer');
+          }));
+        it('GET status: 200 articles sorted by chosen column', () => request
+          .get('/api/articles/1/comments?sort_by=comment_id')
+          .expect(200)
+          .then((res) => {
+            expect(res.body.comments[0].comment_id).to.equal(2);
+          }));
+        it('GET status: 200 articles sorted by default of column created_at if invalid sort is given', () => request
+          .get('/api/articles/1/comments?sort_by=charizard')
+          .expect(200)
+          .then((res) => {
+            expect(res.body.comments[0].comment_id).to.equal(2);
+          }));
+        it('GET status: 200 articles sorted by chosen column and order of sort', () => request
+          .get('/api/articles/1/comments?sort_ascending=true')
+          .expect(200)
+          .then((res) => {
+            expect(res.body.comments[0].comment_id).to.equal(18);
+          }));
+        it('GET status: 200 returns articles on a given page', () => request
+          .get('/api/articles/1/comments?p=2')
+          .expect(200)
+          .then((res) => {
+            expect(res.body.comments[0].comment_id).to.equal(12);
+          }));
+        it('GET status: 400 invalid syntax is used in the p query', () => request
+          .get('/api/articles/1/comments?p=kfc')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).to.equal('invalid input syntax for type integer');
+          }));
+        it('POST status: 201 returns an object with the posted comment', () => {
+          const newPost = {
+            body: 'my first comment',
+            username: 'butter_bridge',
+          };
+          return request
+            .post('/api/articles/9/comments')
+            .expect(201)
+            .send(newPost)
+            .then((res) => {
+              expect(res.body.comment.username).to.eql('butter_bridge');
+              expect(res.body.comment.body).to.eql('my first comment');
+            });
+        });
+
+        // //////////////////////////////////////////////////////////////
+
+        describe('/articles/:article_id/comments/:comment_id', () => {
+          it('PATCH status: 202 takes an object and increases comment votes if postive integer given', () => request
+            .patch('/api/articles/1/comments/2')
+            .send({ inc_votes: 5 })
+            .expect(202)
+            .then((res) => {
+              expect(res.body.commentVotes[0].comment_id).to.equal(2);
+              expect(res.body.commentVotes[0].votes).to.equal(19);
+            }));
+          it('PATCH status: 202 takes an object and decreases comment votes if negative integer given', () => request
+            .patch('/api/articles/1/comments/2')
+            .send({ inc_votes: -5 })
+            .expect(202)
+            .then((res) => {
+              expect(res.body.commentVotes[0].comment_id).to.equal(2);
+              expect(res.body.commentVotes[0].votes).to.equal(9);
+            }));
+          it('DELETE status 204: removes given article by article id', () => request
+            .delete('/api/articles/1/comments/2')
+            .expect(204)
+            .then((res) => {
+              expect(res.body).to.eql({});
+            }));
+          it('ALL status: 405 input method is not get, patch or delete', () => request
+            .post('/api/articles/1/comments/2')
+            .send({ name: 'mand' })
+            .expect(405)
+            .then((res) => {
+              expect(res.body.msg).to.equal('method not allowed');
+            }));
+        });
       });
     });
   });

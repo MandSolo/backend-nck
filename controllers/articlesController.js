@@ -98,6 +98,7 @@ exports.updateVotesForArticle = (req, res, next) => {
 
   const { article_id } = req.params;
   const { inc_votes } = req.body;
+
   connection('articles')
     .where('article_id', '=', article_id)
     .increment('votes', inc_votes)
@@ -114,6 +115,7 @@ exports.deleteArticleByID = (req, res, next) => {
   // should respond with an empty object
 
   const { article_id } = req.params;
+
   connection('articles')
     .where('article_id', article_id)
     .del()
@@ -167,6 +169,59 @@ exports.getCommentsByArticleID = (req, res, next) => {
     .then((comments) => {
       if (comments.length === 0) return Promise.reject({ status: 404, msg: 'error page not found' });
       return res.status(200).send({ comments });
+    })
+    .catch(next);
+};
+
+exports.addComment = (req, res, next) => {
+// accepts an object with a username and body
+// responds with the posted comment
+
+  const newPost = { ...req.params, ...req.body };
+
+  connection
+    .insert(newPost)
+    .into('comments')
+    .returning('*')
+    .then(([comment]) => {
+      res.status(201).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.updateCommentVotes = (req, res, next) => {
+  // accepts an object in the form { inc_votes: newVote }
+  // newVote will indicate how much the votes property in the database should be updated by
+  // E.g { inc_votes : 1 } would increment the current article's vote property by 1
+  // { inc_votes : -1 } would decrement the current article's vote property by 1
+
+  const { comment_id } = req.params;
+  const { inc_votes } = req.body;
+
+  connection('comments').where('comment_id', '=', comment_id)
+    .increment('votes', inc_votes)
+    .returning('*')
+    .then((commentVotes) => {
+      if (commentVotes.length === 0) return next({ status: 404, msg: 'error page not found' });
+      return res.status(202).send({ commentVotes });
+    })
+    .catch(next);
+};
+
+exports.deleteCommentByID = (req, res, next) => {
+  // should delete the given comment by comment_id
+  // should respond with an empty object
+
+  const { article_id } = req.params;
+  const { comment_id } = req.params;
+
+  return connection('comments')
+    .where('article_id', article_id)
+    .where('comment_id', comment_id)
+    .del()
+    .then((comment) => {
+      if (comment === 0) return Promise.reject({ status: 404, msg: 'error page not found' });
+      return res.status(204).send({});
     })
     .catch(next);
 };

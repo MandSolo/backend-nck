@@ -90,6 +90,7 @@ exports.addArticle = (req, res, next) => {
 
   const { topic } = req.params;
   const { title, username, body } = req.body;
+
   return connection('articles')
     .insert({
       title,
