@@ -407,5 +407,55 @@ describe('/api', () => {
         });
       });
     });
+
+    // //////////////////////////////////////////////////////////////
+
+    describe('/users', () => {
+      it('GET status: 200 responds with an array of user objects with the correct keys and properties', () => request
+        .get('/api/users')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.users).to.be.an('array');
+          expect(res.body.users[0]).to.have.all.keys(
+            'username',
+            'avatar_url',
+            'name',
+          );
+          expect(res.body.users[1].username).to.equal('icellusedkars');
+          expect(res.body.users[2].name).to.equal('paul');
+          expect(res.body.users).to.have.length(3);
+        }));
+
+      it('ALL status: 405 input method is not get or post', () => request
+        .delete('/api/users')
+        .expect(405)
+        .then((res) => {
+          expect(res.body.msg).to.equal('method not allowed');
+        }));
+
+      // //////////////////////////////////////////////////////////////
+
+      describe('/users/:username', () => {
+        it('GET status: 200 responds with an array of user objects with the correct keys and properties', () => {
+          const userObj = {
+            username: 'butter_bridge',
+            avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+            name: 'jonny',
+          };
+          return request
+            .get('/api/users/butter_bridge')
+            .expect(200)
+            .then((res) => {
+              expect(res.body.user).to.eql(userObj);
+            });
+        });
+        it('GET status: 404 input username does not exist', () => request
+          .get('/api/users/starmanda')
+          .expect(404)
+          .then((res) => {
+            expect(res.body.msg).to.equal('error page not found');
+          }));
+      });
+    });
   });
 });
