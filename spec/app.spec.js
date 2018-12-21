@@ -20,6 +20,12 @@ describe('/api', () => {
     .then((res) => {
       expect(res.body.msg).to.equal('error page not found');
     }));
+  it.only('GET status: 200 serves a JSON object describing all the available endpoints on the API', () => request
+    .get('/api')
+    .expect(200)
+    .then((res) => {
+      expect(Object.keys(res.body.endpoints)).to.have.length(9);
+    }));
 
   // //////////////////////////////////////////////////////////////
 
