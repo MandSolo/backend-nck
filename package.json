@@ -4,6 +4,7 @@
   "description": "## Northcoders News API",
   "main": "index.js",
   "scripts": {
+    "start": "node listen.js",
     "test": "mocha ./spec/",
     "lint": "eslint ./",
     "lint:fix": "eslint --fix ./",
@@ -16,7 +17,10 @@
     "create:seed": "knex seed:make seed",
     "create:db": "psql -f ./db/setupTest.sql",
     "seed:run": "knex migrate:rollback --env test && knex migrate:latest --env test && NODE_ENV=test knex seed:run --env test",
-    "dev": "nodemon listen.js"
+    "dev": "nodemon listen.js",
+    "seed:prod": "DB_URL=$(heroku config:get DATABASE_URL) knex seed:run --env production",
+    "migrate:latest:prod": "DB_URL=$(heroku config:get DATABASE_URL) knex migrate:latest --env production",
+    "migrate:rollback:prod": "DB_URL=$(heroku config:get DATABASE_URL) knex migrate:rollback --env production"
   },
   "repository": {
     "type": "git",
@@ -45,4 +49,5 @@
     "eslint-plugin-import": "^2.14.0",
     "husky": "^1.1.4"
   }
+
 }
