@@ -5,12 +5,6 @@
 const connection = require('../db/connection');
 
 exports.getAllUsers = (req, res, next) => {
-  // should respond with an array of user objects
-  // each user object should have
-  // `username`
-  // `avatar_url`
-  // `name`
-
   connection('users')
     .select('*')
     .then((users) => {
@@ -20,11 +14,6 @@ exports.getAllUsers = (req, res, next) => {
 };
 
 exports.getUserByUsername = (req, res, next) => {
-  // should respond with a user object
-  // each user should have
-  // username
-  // avatar_url
-  // name
   const { username } = req.params;
 
   return connection
@@ -32,7 +21,7 @@ exports.getUserByUsername = (req, res, next) => {
     .from('users')
     .where('username', username)
     .then(([user]) => {
-      if (!user) return Promise.reject({ status: 404, msg: 'error page not found' });
+      if (!user) { return Promise.reject({ status: 404, msg: 'error page not found' }); }
       return res.status(200).send({ user });
     })
     .catch(next);
