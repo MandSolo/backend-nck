@@ -36,6 +36,7 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "chai": "^4.2.0",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "knex": "^0.15.2",
     "mocha": "^5.2.0",
@@ -49,5 +50,4 @@
     "eslint-plugin-import": "^2.14.0",
     "husky": "^1.1.4"
   }
-
 }
