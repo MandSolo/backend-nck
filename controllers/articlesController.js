@@ -65,9 +65,9 @@ exports.getArticleByID = (req, res, next) => {
     .count('comments.article_id AS comment_count')
     .where('articles.article_id', article_id)
     .groupBy('articles.article_id', 'users.username')
-    .then((articles) => {
-      if (articles.length === 0) { return Promise.reject({ status: 404, msg: 'error page not found' }); }
-      return res.status(200).send({ articles });
+    .then((article) => {
+      if (article.length === 0) { return Promise.reject({ status: 404, msg: 'error page not found' }); }
+      return res.status(200).send({ article });
     })
     .catch(next);
 };
@@ -80,9 +80,9 @@ exports.updateVotesForArticle = (req, res, next) => {
     .where('article_id', '=', article_id)
     .increment('votes', inc_votes)
     .returning('*')
-    .then(([article]) => {
+    .then((article) => {
       if (article.length === 0) { return Promise.reject({ status: 404, msg: 'error page not found' }); }
-      return res.status(202).send({ article });
+      return res.status(201).send({ article });
     })
     .catch(next);
 };
@@ -165,7 +165,7 @@ exports.updateCommentVotes = (req, res, next) => {
     .returning('*')
     .then((commentVotes) => {
       if (commentVotes.length === 0) { return next({ status: 404, msg: 'error page not found' }); }
-      return res.status(202).send({ commentVotes });
+      return res.status(201).send({ commentVotes });
     })
     .catch(next);
 };

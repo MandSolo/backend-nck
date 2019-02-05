@@ -234,7 +234,7 @@ describe('/api', () => {
         expect(res.body.msg).to.equal('invalid input syntax for type integer');
       }));
     it('GET status: 404 given non existant article', () => request
-      .get('/api/articles/ronaldo')
+      .get('/api/articles/1000')
       .expect(404)
       .then((res) => {
         expect(res.body.msg).to.equal('error page not found');

@@ -48,6 +48,7 @@ exports.getAllArticlesForTopic = (req, res, next) => {
 
   return connection
     .select(
+      'articles.body',
       'articles.title',
       'articles.username AS author',
       'articles.article_id',
